@@ -37,6 +37,27 @@ export const additionalSensors = [
  * List of valid gcode file extensions
  */
 export const validGcodeExtensions = ['.gcode', '.g', '.gco', '.ufp', '.nc']
+export const multiPlateExtension = '.gcode.3mf'
+
+export function isMultiPlateFile(filename: string): boolean {
+    return filename.toLowerCase().endsWith(multiPlateExtension)
+}
+
+export function isGcodeFile(filename: string): boolean {
+    const lower = filename.toLowerCase()
+    if (isMultiPlateFile(lower)) return true
+
+    const extensionPos = lower.lastIndexOf('.')
+    if (extensionPos === -1) return false
+
+    return validGcodeExtensions.includes(lower.slice(extensionPos))
+}
+
+export function gcodeFileExtension(filename: string): string {
+    if (isMultiPlateFile(filename)) return multiPlateExtension
+
+    return filename.slice(filename.lastIndexOf('.'))
+}
 
 /*
  * List of initable server components
@@ -83,6 +104,10 @@ export const allowedMetadata = [
     'filament_total',
     'filament_weight_total',
     'filament_weights',
+    'is_3mf',
+    'sliced',
+    'plate_count',
+    'plates',
     'nozzle_diameter',
     'first_layer_bed_temp',
     'first_layer_extr_temp',

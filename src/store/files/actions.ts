@@ -9,7 +9,7 @@ import {
 } from '@/store/files/types'
 import { RootState } from '@/store/types'
 import i18n from '@/plugins/i18n'
-import { hiddenDirectories, validGcodeExtensions } from '@/store/variables'
+import { hiddenDirectories, isGcodeFile } from '@/store/variables'
 import axios, { AxiosProgressEvent, AxiosResponse } from 'axios'
 import { BatchMessage } from '@/plugins/webSocketClient'
 
@@ -214,10 +214,7 @@ export const actions: ActionTree<FileState, RootState> = {
 
                 // move all other files
                 await commit('setMoveFile', payload)
-                if (
-                    payload.item.root === 'gcodes' &&
-                    validGcodeExtensions.includes(payload.item.path.slice(payload.item.path.lastIndexOf('.')))
-                ) {
+                if (payload.item.root === 'gcodes' && isGcodeFile(payload.item.path)) {
                     await dispatch('requestMetadata', [
                         {
                             filename: 'gcodes/' + payload.item.path,

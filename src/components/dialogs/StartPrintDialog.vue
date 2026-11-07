@@ -9,6 +9,9 @@
             <start-print-dialog-thumbnail :file="file" :current-path="currentPath" />
             <v-card-title class="text-h5">{{ $t('Dialogs.StartPrint.Headline') }}</v-card-title>
             <v-card-text class="pb-0">
+                <p v-if="plate !== null" class="body-2 mb-2">
+                    {{ $t('Files.Plate', { index: plate }) }}
+                </p>
                 <p class="body-2">
                     {{ question }}
                 </p>
@@ -51,6 +54,7 @@ export default class StartPrintDialog extends Mixins(BaseMixin, AfcMixin) {
     @VModel({ type: Boolean }) showDialog!: boolean
     @Prop({ required: true, default: '' }) readonly currentPath!: string
     @Prop({ required: true }) readonly file!: FileStateGcodefile
+    @Prop({ type: Number, default: null }) readonly plate!: number | null
 
     get existsMmu() {
         return this.$store.state.printer.mmu?.enabled && this.$store.state.printer.mmu?.gate !== -2
@@ -91,7 +95,11 @@ export default class StartPrintDialog extends Mixins(BaseMixin, AfcMixin) {
         }
 
         this.closeDialog()
-        this.$socket.emit('printer.print.start', { filename }, { action: 'switchToDashboard' })
+
+        const params: { filename: string; plate?: number } = { filename }
+        if (this.plate !== null && this.plate !== undefined) params.plate = this.plate
+
+        this.$socket.emit('printer.print.start', params, { action: 'switchToDashboard' })
     }
 
     closeDialog() {

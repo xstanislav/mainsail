@@ -410,7 +410,16 @@ export default class Viewer extends Mixins(BaseMixin) {
     get panelTitle() {
         let title = this.$t('GCodeViewer.Title').toString()
 
-        if (this.loadedFile) title += `: ${this.loadedFile}`
+        const source = this.$route.query?.source
+        if (typeof source === 'string' && source) {
+            const plate = this.$route.query?.plate
+            const plateLabel =
+                typeof plate === 'string' && plate ? ` (${this.$t('Files.Plate', { index: plate })})` : ''
+
+            title += `: ${source}${plateLabel}`
+        } else if (this.loadedFile) {
+            title += `: ${this.loadedFile}`
+        }
 
         return title
     }

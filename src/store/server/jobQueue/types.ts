@@ -7,6 +7,9 @@ export interface ServerJobQueueState {
 
 export interface ServerJobQueueStateJob {
     filename: string
+    source_filename?: string
+    plate?: number | null
+    plate_name?: string | null
     job_id: string
     time_added: number
     time_in_queue: number

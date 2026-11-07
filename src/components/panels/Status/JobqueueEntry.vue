@@ -13,6 +13,9 @@
             <div class="text-truncate">
                 <strong v-if="job.combinedIds?.length">{{ job.combinedIds.length + 1 }}x</strong>
                 {{ job.filename }}
+                <span v-if="job.plate !== null && job.plate !== undefined" class="ml-1">
+                    · {{ job.plate_name || $t('Files.Plate', { index: job.plate }) }}
+                </span>
             </div>
             <small v-if="description" class="text-truncate">{{ description }}</small>
         </v-col>

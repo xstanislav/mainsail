@@ -1,9 +1,10 @@
 import {
+    isGcodeFile,
+    isMultiPlateFile,
     themeDir,
     thumbnailBigMin,
     thumbnailSmallMax,
     thumbnailSmallMin,
-    validGcodeExtensions,
 } from '@/store/variables'
 import { GetterTree } from 'vuex'
 import { FileState, FileStateFile, FileStateGcodefile } from '@/store/files/types'
@@ -76,10 +77,7 @@ export const getters: GetterTree<FileState, RootState> = {
                 // START filter != gcode files or dirs
                 if (file.isDirectory) return true
 
-                const pos = file.filename.lastIndexOf('.')
-                const extension = file.filename.slice(pos)
-
-                return validGcodeExtensions.includes(extension)
+                return isGcodeFile(file.filename)
                 // END filter != gcode files or dirs
             })
 
@@ -118,13 +116,21 @@ export const getters: GetterTree<FileState, RootState> = {
                     tmp.preheat_gcode = preheat_gcode_array.join('\n')
                 }
 
-                let histories = rootGetters['server/history/getPrintJobsForGcodes'](
-                    tmp.full_filename,
-                    fileTimestamp,
-                    file.size,
-                    file.uuid ?? null,
-                    file.job_id
-                )
+                let histories: ServerHistoryStateJob[]
+                if (isMultiPlateFile(file.filename)) {
+                    const sourceFilename = tmp.full_filename.replace(/^\/+/, '')
+                    histories = (rootState.server?.history?.jobs ?? []).filter(
+                        (job: ServerHistoryStateJob) => job.metadata?.source_filename === sourceFilename
+                    )
+                } else {
+                    histories = rootGetters['server/history/getPrintJobsForGcodes'](
+                        tmp.full_filename,
+                        fileTimestamp,
+                        file.size,
+                        file.uuid ?? null,
+                        file.job_id
+                    )
+                }
 
                 if (histories && histories.length) {
                     histories = histories.sort(
@@ -135,7 +141,7 @@ export const getters: GetterTree<FileState, RootState> = {
                         (history: ServerHistoryStateJob) => history.status === 'completed'
                     )
 
-                    const last_history = [...histories].shift()
+                    const last_history = histories[0]
                     tmp.last_status = last_history.status
                     tmp.count_printed = histories_completed.length
                     tmp.last_start_time = new Date(last_history.start_time * 1000)

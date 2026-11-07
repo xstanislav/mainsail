@@ -13,6 +13,30 @@ export interface FileState {
     }
 }
 
+export interface FileStateThreeMfPlate {
+    index: number
+    name: string
+    gcode_filename?: string | null
+    gcode_size?: number
+    gcode_md5?: string | null
+    prediction?: number | null
+    weight?: number | null
+    first_layer_time?: number | null
+    filament_type?: string[]
+    filament_colors?: string[]
+    filament_names?: string[]
+    filament_weights?: number[]
+    referenced_tools?: number[]
+    object_count?: number
+    support_used?: boolean
+    is_seq_print?: boolean
+    bed_type?: string | null
+    locked?: boolean
+    printable?: boolean
+    warnings?: string[]
+    thumbnails?: FileStateFileThumbnail[]
+}
+
 export interface FileStateFile {
     isDirectory: boolean
     filename: string
@@ -45,6 +69,10 @@ export interface FileStateFile {
     slicer?: string
     slicer_version?: string
     thumbnails?: FileStateFileThumbnail[]
+    is_3mf?: boolean
+    sliced?: boolean
+    plate_count?: number
+    plates?: FileStateThreeMfPlate[]
     metadataPulled?: boolean
     metadataRequested?: boolean
     size?: number
@@ -87,6 +115,8 @@ export interface FileStateFileThumbnail {
     height: number
     size: number
     relative_path: string
+    plate?: number
+    type?: string
 }
 
 export interface ApiGetDirectoryReturn {

@@ -71,7 +71,7 @@ import { mdiCloudDownload, mdiDelete, mdiFolderPlus, mdiMagnify, mdiRefresh, mdi
 import { FileStateFile } from '@/store/files/types'
 import { escapePath, generateTimestamp } from '@/plugins/helpers'
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
-import { validGcodeExtensions } from '@/store/variables'
+import { multiPlateExtension, validGcodeExtensions } from '@/store/variables'
 
 @Component({
     components: { ConfirmationDialog },
@@ -92,7 +92,7 @@ export default class GcodefilesPanelHeader extends Mixins(BaseMixin, GcodefilesM
     get gcodeInputFileAccept() {
         if (this.isIOS) return []
 
-        return validGcodeExtensions
+        return [...validGcodeExtensions, multiPlateExtension]
     }
 
     get deleteSelectedText(): string {

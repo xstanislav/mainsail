@@ -35,7 +35,10 @@
         <v-col class="py-1" style="min-width: 0; font-size: 0.875em">
             <div class="text-truncate">
                 <strong v-if="job.count > 1">{{ job.count }}x</strong>
-                {{ job.filename }}
+                {{ displayFilename }}
+                <span v-if="sourcePlate !== null" class="ml-1 text--secondary">
+                    · {{ displayPlateName || $t('Files.Plate', { index: sourcePlate }) }}
+                </span>
             </div>
             <small v-if="description" class="text-truncate">{{ description }}</small>
         </v-col>
@@ -54,17 +57,19 @@
         <v-menu v-model="showContextMenu" :position-x="contextMenuX" :position-y="contextMenuY" absolute offset-y>
             <v-list>
                 <v-list-item
-                    v-if="job.exists && file"
+                    v-if="canReprint"
                     :disabled="printerIsPrinting || !klipperReadyForGui"
                     @click="startPrintDialogBool = true">
                     <v-icon class="mr-1">{{ mdiPrinter }}</v-icon>
                     {{ $t('History.Reprint') }}
                 </v-list-item>
-                <v-list-item v-if="job.exists && isJobQueueAvailable" @click="addToQueue">
+                <v-list-item v-if="canReprint && isJobQueueAvailable" @click="addToQueue">
                     <v-icon class="mr-1">{{ mdiPlaylistPlus }}</v-icon>
                     {{ $t('Files.AddToQueue') }}
                 </v-list-item>
-                <v-list-item v-if="job.exists && isJobQueueAvailable" @click="addBatchToQueueDialogBool = true">
+                <v-list-item
+                    v-if="canReprint && isJobQueueAvailable && sourcePlate === null"
+                    @click="addBatchToQueueDialogBool = true">
                     <v-icon class="mr-1">{{ mdiPlaylistPlus }}</v-icon>
                     {{ $t('Files.AddBatchToQueue') }}
                 </v-list-item>
@@ -76,10 +81,11 @@
         </v-menu>
         <add-batch-to-queue-dialog v-model="addBatchToQueueDialogBool" :show-toast="true" :filename="job.filename" />
         <start-print-dialog
-            v-if="job.exists && file"
+            v-if="canReprint"
             v-model="startPrintDialogBool"
-            :file="file"
-            :current-path="currentPath" />
+            :file="printFile"
+            :current-path="currentPath"
+            :plate="sourcePlate" />
     </v-row>
 </template>
 
@@ -116,19 +122,60 @@ export default class StatusPanelHistoryEntry extends Mixins(BaseMixin) {
     addBatchToQueueDialogBool = false
     startPrintDialogBool = false
 
+    get sourceFilename(): string | null {
+        const source = this.job.metadata?.source_filename
+        return typeof source === 'string' && source ? source : null
+    }
+
+    get sourcePlate(): number | null {
+        const plate = this.job.metadata?.source_plate
+        return typeof plate === 'number' ? plate : null
+    }
+
+    get displayFilename(): string {
+        return this.sourceFilename ?? this.job.filename
+    }
+
+    get displayPlateName(): string | null {
+        const name = this.job.metadata?.source_plate_name
+        return typeof name === 'string' && name ? name : null
+    }
+
     get file(): FileStateGcodefile | undefined {
-        return this.$store.getters['files/getFile']('gcodes/' + this.job.filename) ?? undefined
+        return this.$store.getters['files/getFile']('gcodes/' + this.displayFilename) ?? undefined
+    }
+
+    get printFile(): FileStateGcodefile | undefined {
+        if (!this.file || this.sourcePlate === null) return this.file
+
+        const plate = this.file.plates?.find((entry) => entry.index === this.sourcePlate)
+        if (!plate) return this.file
+
+        return {
+            ...this.file,
+            thumbnails: plate.thumbnails ?? this.file.thumbnails,
+            estimated_time: plate.prediction ?? this.file.estimated_time,
+            filament_weight_total: plate.weight ?? this.file.filament_weight_total,
+            filament_weights: plate.filament_weights,
+            filament_type: plate.filament_type?.join(', ') ?? this.file.filament_type,
+            filament_colors: plate.filament_colors ?? this.file.filament_colors,
+            referenced_tools: plate.referenced_tools ?? this.file.referenced_tools,
+        }
+    }
+
+    get canReprint(): boolean {
+        return this.file !== undefined
     }
 
     get currentPath(): string {
-        const lastSlash = this.job.filename.lastIndexOf('/')
-        return lastSlash > 0 ? '/' + this.job.filename.slice(0, lastSlash) : ''
+        const lastSlash = this.displayFilename.lastIndexOf('/')
+        return lastSlash > 0 ? '/' + this.displayFilename.slice(0, lastSlash) : ''
     }
 
     get smallThumbnail() {
-        if ((this.job.metadata?.thumbnails?.length ?? 0) < 1) return false
+        if ((this.historyThumbnails.length ?? 0) < 1) return false
 
-        const thumbnail = this.job.metadata?.thumbnails?.find(
+        const thumbnail = this.historyThumbnails.find(
             (thumb) =>
                 thumb.width >= thumbnailSmallMin &&
                 thumb.width <= thumbnailSmallMax &&
@@ -140,11 +187,17 @@ export default class StatusPanelHistoryEntry extends Mixins(BaseMixin) {
     }
 
     get bigThumbnail() {
-        if ((this.job.metadata?.thumbnails?.length ?? 0) < 1) return false
+        if ((this.historyThumbnails.length ?? 0) < 1) return false
 
-        const thumbnail = this.job.metadata?.thumbnails?.find((thumb) => thumb.width >= thumbnailBigMin)
+        const thumbnail = this.historyThumbnails.find((thumb) => thumb.width >= thumbnailBigMin)
 
         return thumbnail ? this.createThumbnailUrl(thumbnail) : false
+    }
+
+    get historyThumbnails(): FileStateFileThumbnail[] {
+        if (this.printFile?.thumbnails?.length) return this.printFile.thumbnails
+
+        return this.job.metadata?.thumbnails ?? []
     }
 
     get statusIcon() {
@@ -248,8 +301,12 @@ export default class StatusPanelHistoryEntry extends Mixins(BaseMixin) {
     }
 
     addToQueue() {
-        this.$store.dispatch('server/jobQueue/addToQueue', [this.job.filename])
-        this.$toast.info(this.$t('History.AddToQueueSuccessful', { filename: this.job.filename }).toString())
+        const filename = this.displayFilename
+        const plate = this.sourcePlate
+        const file = plate === null ? filename : { filename, plate }
+
+        this.$store.dispatch('server/jobQueue/addToQueue', [file])
+        this.$toast.info(this.$t('History.AddToQueueSuccessful', { filename }).toString())
     }
 
     deleteJob() {
@@ -262,12 +319,14 @@ export default class StatusPanelHistoryEntry extends Mixins(BaseMixin) {
 
     createThumbnailUrl(thumbnail: FileStateFileThumbnail) {
         let relative_url = ''
-        if (this.job.filename.lastIndexOf('/') !== -1) {
-            relative_url = this.job.filename.substring(0, this.job.filename.lastIndexOf('/') + 1)
+        if (this.displayFilename.lastIndexOf('/') !== -1) {
+            relative_url = this.displayFilename.substring(0, this.displayFilename.lastIndexOf('/') + 1)
         }
 
+        const timestamp = this.file?.modified?.getTime?.() ?? this.job.metadata.modified
+
         return `${this.apiUrl}/server/files/gcodes/${escapePath(relative_url + thumbnail.relative_path)}?timestamp=${
-            this.job.metadata.modified
+            timestamp
         }`
     }
 

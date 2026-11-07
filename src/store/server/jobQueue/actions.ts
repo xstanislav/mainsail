@@ -24,8 +24,16 @@ export const actions: ActionTree<ServerJobQueueState, RootState> = {
         await dispatch('socket/removeInitModule', 'server/jobQueue/init', { root: true })
     },
 
-    async addToQueue(_, filenames: string[]) {
-        Vue.$socket.emit('server.job_queue.post_job', { filenames: filenames })
+    async addToQueue(_, files: Array<string | { filename: string; plate?: number }>) {
+        const jobs = files.map((file) => (typeof file === 'string' ? { filename: file } : file))
+        const hasPlate = jobs.some((job) => job.plate !== undefined)
+
+        if (hasPlate) {
+            Vue.$socket.emit('server.job_queue.post_job', { jobs })
+            return
+        }
+
+        Vue.$socket.emit('server.job_queue.post_job', { filenames: jobs.map((job) => job.filename) })
     },
 
     changeCount({ dispatch, getters }, payload: { job_id: string; count: number }) {
@@ -61,28 +69,23 @@ export const actions: ActionTree<ServerJobQueueState, RootState> = {
     },
 
     sendNewQueueList(_, payload: { jobs: ServerJobQueueStateJob[]; printStart?: boolean }) {
-        const filenames = payload.jobs
+        const jobs = payload.jobs
             .map((job) => {
                 const numJobs = (job.combinedIds?.length ?? 0) + 1
-                // return job.filename if the job will be only printed one time
-                if (numJobs === 1) return job.filename
-
-                // return an array of job.filename if the job will be printed multiple times
-                return Array(numJobs).fill(job.filename)
+                return Array.from({ length: numJobs }, () => ({
+                    filename: job.filename,
+                    ...(job.plate !== null && job.plate !== undefined ? { plate: job.plate } : {}),
+                }))
             })
             .flat()
 
         const emitOptions: { action?: string } = {}
         if (payload.printStart) emitOptions.action = 'server/jobQueue/start'
 
-        Vue.$socket.emit(
-            'server.job_queue.post_job',
-            {
-                filenames,
-                reset: true,
-            },
-            emitOptions
-        )
+        const hasPlate = jobs.some((job) => job.plate !== undefined)
+        const body = hasPlate ? { jobs, reset: true } : { filenames: jobs.map((job) => job.filename), reset: true }
+
+        Vue.$socket.emit('server.job_queue.post_job', body, emitOptions)
     },
 
     deleteFromQueue(_, job_ids: string[]) {

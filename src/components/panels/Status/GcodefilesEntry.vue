@@ -3,7 +3,7 @@
         v-longpress:600="showContextMenu"
         class="cursor-pointer"
         @contextmenu="showContextMenu($event)"
-        @click="showPrintDialog = true">
+        @click="openPrintDialog">
         <td class="pr-0 text-center" style="width: 32px">
             <gcodefiles-thumbnail :item="item" />
         </td>
@@ -23,15 +23,18 @@
         </td>
         <v-menu v-model="contextMenuShow" :position-x="contextMenuX" :position-y="contextMenuY" absolute offset-y>
             <v-list>
-                <v-list-item :disabled="printerIsPrinting || !klipperReadyForGui" @click="showPrintDialog = true">
+                <v-list-item :disabled="printerIsPrinting || !klipperReadyForGui" @click="openPrintDialog">
                     <v-icon class="mr-1">{{ mdiPlay }}</v-icon>
                     {{ $t('Files.PrintStart') }}
                 </v-list-item>
-                <v-list-item v-if="moonrakerComponents.includes('job_queue')" @click="addToQueue">
+                <v-list-item v-if="moonrakerComponents.includes('job_queue')" @click="openQueueDialog">
                     <v-icon class="mr-1">{{ mdiPlaylistPlus }}</v-icon>
                     {{ $t('Files.AddToQueue') }}
                 </v-list-item>
-                <v-list-item v-if="moonrakerComponents.includes('job_queue')" @click="showAddBatchToQueueDialog = true">
+                <v-list-item
+                    v-if="moonrakerComponents.includes('job_queue')"
+                    :disabled="multiPlate"
+                    @click="showAddBatchToQueueDialog = true">
                     <v-icon class="mr-1">{{ mdiPlaylistPlus }}</v-icon>
                     {{ $t('Files.AddBatchToQueue') }}
                 </v-list-item>
@@ -42,7 +45,7 @@
                     <v-icon class="mr-1">{{ mdiFire }}</v-icon>
                     {{ $t('Files.Preheat') }}
                 </v-list-item>
-                <v-list-item @click="view3D">
+                <v-list-item @click="openViewDialog">
                     <v-icon class="mr-1">{{ mdiVideo3d }}</v-icon>
                     {{ $t('Files.View3D') }}
                 </v-list-item>
@@ -50,7 +53,7 @@
                     <v-icon class="mr-1">{{ mdiCloudDownload }}</v-icon>
                     {{ $t('Files.Download') }}
                 </v-list-item>
-                <v-list-item @click="editFile">
+                <v-list-item :disabled="multiPlate" @click="editFile">
                     <v-icon class="mr-1">{{ mdiFileDocumentEditOutline }}</v-icon>
                     {{ $t('Files.EditFile') }}
                 </v-list-item>
@@ -64,7 +67,18 @@
                 </v-list-item>
             </v-list>
         </v-menu>
-        <start-print-dialog v-model="showPrintDialog" :file="item" current-path="" />
+        <start-print-dialog
+            v-model="showPrintDialog"
+            :file="printFile"
+            :plate="selectedPlate?.index ?? null"
+            current-path="" />
+        <gcodefiles-three-mf-plate-dialog
+            v-model="showPlateDialog"
+            :item="item"
+            :mode="plateDialogMode"
+            @print="startThreeMfPrint"
+            @queue="queueThreeMfPlate"
+            @view="viewThreeMfPlate" />
         <add-batch-to-queue-dialog v-model="showAddBatchToQueueDialog" :filename="filename" />
         <gcodefiles-rename-file-dialog v-model="showRenameFileDialog" :item="item" />
         <confirmation-dialog
@@ -82,8 +96,10 @@ import { Mixins, Prop } from 'vue-property-decorator'
 import type { LongpressEvent } from '@/directives/longpress'
 import BaseMixin from '@/components/mixins/base'
 import ControlMixin from '@/components/mixins/control'
-import { FileStateGcodefile } from '@/store/files/types'
+import { FileStateGcodefile, FileStateThreeMfPlate } from '@/store/files/types'
 import StartPrintDialog from '@/components/dialogs/StartPrintDialog.vue'
+import GcodefilesThreeMfPlateDialog from '@/components/dialogs/GcodefilesThreeMfPlateDialog.vue'
+import { isMultiPlateFile } from '@/store/variables'
 import {
     mdiPlay,
     mdiPlaylistPlus,
@@ -100,10 +116,12 @@ import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
 import { convertPrintStatusIcon, convertPrintStatusIconColor, escapePath, formatPrintTime } from '@/plugins/helpers'
 import GcodefilesThumbnail from '@/components/panels/Gcodefiles/GcodefilesThumbnail.vue'
 import { CLOSE_CONTEXT_MENU, EventBus } from '@/plugins/eventBus'
+import axios from 'axios'
 
 @Component({
     components: {
         GcodefilesThumbnail,
+        GcodefilesThreeMfPlateDialog,
         Panel,
         StartPrintDialog,
         AddBatchToQueueDialog,
@@ -131,6 +149,9 @@ export default class StatusPanelGcodefilesEntry extends Mixins(BaseMixin, Contro
     showAddBatchToQueueDialog = false
     showRenameFileDialog = false
     renameFileNewName = ''
+    showPlateDialog = false
+    plateDialogMode: 'print' | 'queue' | 'view' = 'print'
+    selectedPlate: FileStateThreeMfPlate | null = null
 
     showDeleteDialog = false
 
@@ -174,6 +195,92 @@ export default class StatusPanelGcodefilesEntry extends Mixins(BaseMixin, Contro
 
     get filename() {
         return this.item.filename.slice(this.item.filename.lastIndexOf('/') + 1)
+    }
+
+    get multiPlate() {
+        return isMultiPlateFile(this.item.filename)
+    }
+
+    get printFile(): FileStateGcodefile {
+        if (!this.selectedPlate) return this.item
+
+        return {
+            ...this.item,
+            thumbnails: this.selectedPlate.thumbnails ?? this.item.thumbnails,
+            estimated_time: this.selectedPlate.prediction ?? this.item.estimated_time,
+            filament_weight_total: this.selectedPlate.weight ?? this.item.filament_weight_total,
+            filament_weights: this.selectedPlate.filament_weights,
+            filament_type: this.selectedPlate.filament_type?.join(', ') ?? this.item.filament_type,
+            filament_colors: this.selectedPlate.filament_colors ?? this.item.filament_colors,
+            referenced_tools: this.selectedPlate.referenced_tools ?? this.item.referenced_tools,
+        }
+    }
+
+    openPrintDialog() {
+        if (this.multiPlate) {
+            this.plateDialogMode = 'print'
+            this.showPlateDialog = true
+            return
+        }
+
+        this.selectedPlate = null
+        this.showPrintDialog = true
+    }
+
+    openQueueDialog() {
+        if (this.multiPlate) {
+            this.plateDialogMode = 'queue'
+            this.showPlateDialog = true
+            return
+        }
+
+        this.addToQueue()
+    }
+
+    openViewDialog() {
+        if (this.multiPlate) {
+            this.plateDialogMode = 'view'
+            this.showPlateDialog = true
+            return
+        }
+
+        this.view3D()
+    }
+
+    startThreeMfPrint(plate: FileStateThreeMfPlate) {
+        this.selectedPlate = plate
+        this.showPlateDialog = false
+        this.showPrintDialog = true
+    }
+
+    queueThreeMfPlate(plate: FileStateThreeMfPlate) {
+        this.$store.dispatch('server/jobQueue/addToQueue', [{ filename: this.item.filename, plate: plate.index }])
+        this.showPlateDialog = false
+    }
+
+    async viewThreeMfPlate(plate: FileStateThreeMfPlate) {
+        try {
+            const response = await axios.post(this.apiUrl + '/server/files/extract_plate', {
+                filename: this.item.filename,
+                plate: plate.index,
+            })
+            const extracted = response.data?.result?.item?.path
+            if (!extracted) throw new Error('No plate path returned')
+
+            this.$router.push({
+                path: '/viewer',
+                query: {
+                    filename: 'gcodes/' + extracted,
+                    source: this.item.filename,
+                    plate: plate.index.toString(),
+                },
+            })
+        } catch (error) {
+            window.console.error(error)
+            this.$toast.error(this.$t('Files.ExtractPlateFailed').toString())
+        } finally {
+            this.showPlateDialog = false
+        }
     }
 
     showContextMenu(e: MouseEvent | LongpressEvent) {

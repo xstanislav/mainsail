@@ -50,7 +50,12 @@
                 <v-icon>{{ mdiFile }}</v-icon>
             </template>
         </td>
-        <td>{{ item.filename }}</td>
+        <td>
+            {{ displayFilename }}
+            <span v-if="sourcePlate !== null" class="ml-1 text--secondary">
+                · {{ displayPlateName || $t('Files.Plate', { index: sourcePlate }) }}
+            </span>
+        </td>
         <td class="text-right text-no-wrap">
             <template v-if="'note' in item && item.note">
                 <v-tooltip top>
@@ -90,17 +95,19 @@
                     {{ $t('History.AddNote') }}
                 </v-list-item>
                 <v-list-item
-                    v-if="item.exists && file"
+                    v-if="canReprint"
                     :disabled="printerIsPrinting || !klipperReadyForGui"
                     @click="startPrintDialogBool = true">
                     <v-icon class="mr-1">{{ mdiPrinter }}</v-icon>
                     {{ $t('History.Reprint') }}
                 </v-list-item>
-                <v-list-item v-if="item.exists && isJobQueueAvailable" @click="addToQueue">
+                <v-list-item v-if="canReprint && isJobQueueAvailable" @click="addToQueue">
                     <v-icon class="mr-1">{{ mdiPlaylistPlus }}</v-icon>
                     {{ $t('Files.AddToQueue') }}
                 </v-list-item>
-                <v-list-item v-if="item.exists && isJobQueueAvailable" @click="addBatchToQueueDialogBool = true">
+                <v-list-item
+                    v-if="canReprint && isJobQueueAvailable && sourcePlate === null"
+                    @click="addBatchToQueueDialogBool = true">
                     <v-icon class="mr-1">{{ mdiPlaylistPlus }}</v-icon>
                     {{ $t('Files.AddBatchToQueue') }}
                 </v-list-item>
@@ -114,10 +121,11 @@
         <history-list-panel-note-dialog v-model="noteDialogBool" :type="noteDialogType" :job="item" />
         <add-batch-to-queue-dialog v-model="addBatchToQueueDialogBool" :show-toast="true" :filename="item.filename" />
         <start-print-dialog
-            v-if="item.exists && file"
+            v-if="canReprint"
             v-model="startPrintDialogBool"
-            :file="file"
-            :current-path="currentPath" />
+            :file="printFile"
+            :current-path="currentPath"
+            :plate="sourcePlate" />
     </tr>
 </template>
 <script lang="ts">
@@ -191,19 +199,60 @@ export default class HistoryListPanel extends Mixins(BaseMixin) {
     @Prop({ type: Array, required: true }) readonly tableFields!: HistoryListPanelCol[]
     @Prop({ type: Boolean, required: true }) readonly isSelected!: boolean
 
+    get sourceFilename(): string | null {
+        const source = this.item.metadata?.source_filename
+        return typeof source === 'string' && source ? source : null
+    }
+
+    get sourcePlate(): number | null {
+        const plate = this.item.metadata?.source_plate
+        return typeof plate === 'number' ? plate : null
+    }
+
+    get displayFilename(): string {
+        return this.sourceFilename ?? this.item.filename
+    }
+
+    get displayPlateName(): string | null {
+        const name = this.item.metadata?.source_plate_name
+        return typeof name === 'string' && name ? name : null
+    }
+
     get file(): FileStateGcodefile | undefined {
-        return this.$store.getters['files/getFile']('gcodes/' + this.item.filename) ?? undefined
+        return this.$store.getters['files/getFile']('gcodes/' + this.displayFilename) ?? undefined
+    }
+
+    get printFile(): FileStateGcodefile | undefined {
+        if (!this.file || this.sourcePlate === null) return this.file
+
+        const plate = this.file.plates?.find((entry) => entry.index === this.sourcePlate)
+        if (!plate) return this.file
+
+        return {
+            ...this.file,
+            thumbnails: plate.thumbnails ?? this.file.thumbnails,
+            estimated_time: plate.prediction ?? this.file.estimated_time,
+            filament_weight_total: plate.weight ?? this.file.filament_weight_total,
+            filament_weights: plate.filament_weights,
+            filament_type: plate.filament_type?.join(', ') ?? this.file.filament_type,
+            filament_colors: plate.filament_colors ?? this.file.filament_colors,
+            referenced_tools: plate.referenced_tools ?? this.file.referenced_tools,
+        }
+    }
+
+    get canReprint(): boolean {
+        return this.file !== undefined
     }
 
     get currentPath(): string {
-        const lastSlash = this.item.filename.lastIndexOf('/')
-        return lastSlash > 0 ? '/' + this.item.filename.slice(0, lastSlash) : ''
+        const lastSlash = this.displayFilename.lastIndexOf('/')
+        return lastSlash > 0 ? '/' + this.displayFilename.slice(0, lastSlash) : ''
     }
 
     get smallThumbnail() {
-        if ((this.item.metadata?.thumbnails?.length ?? 0) < 1) return false
+        if ((this.historyThumbnails.length ?? 0) < 1) return false
 
-        const thumbnail = this.item.metadata?.thumbnails?.find(
+        const thumbnail = this.historyThumbnails.find(
             (thumb) =>
                 thumb.width >= thumbnailSmallMin &&
                 thumb.width <= thumbnailSmallMax &&
@@ -215,11 +264,17 @@ export default class HistoryListPanel extends Mixins(BaseMixin) {
     }
 
     get bigThumbnail() {
-        if ((this.item.metadata?.thumbnails?.length ?? 0) < 1) return false
+        if ((this.historyThumbnails.length ?? 0) < 1) return false
 
-        const thumbnail = this.item.metadata?.thumbnails?.find((thumb) => thumb.width >= thumbnailBigMin)
+        const thumbnail = this.historyThumbnails.find((thumb) => thumb.width >= thumbnailBigMin)
 
         return thumbnail ? this.createThumbnailUrl(thumbnail) : false
+    }
+
+    get historyThumbnails(): FileStateFileThumbnail[] {
+        if (this.printFile?.thumbnails?.length) return this.printFile.thumbnails
+
+        return this.item.metadata?.thumbnails ?? []
     }
 
     get statusIcon() {
@@ -278,8 +333,12 @@ export default class HistoryListPanel extends Mixins(BaseMixin) {
     }
 
     addToQueue() {
-        this.$store.dispatch('server/jobQueue/addToQueue', [this.item.filename])
-        this.$toast.info(this.$t('History.AddToQueueSuccessful', { filename: this.item.filename }).toString())
+        const filename = this.displayFilename
+        const plate = this.sourcePlate
+        const file = plate === null ? filename : { filename, plate }
+
+        this.$store.dispatch('server/jobQueue/addToQueue', [file])
+        this.$toast.info(this.$t('History.AddToQueueSuccessful', { filename }).toString())
     }
 
     deleteJob() {
@@ -338,12 +397,14 @@ export default class HistoryListPanel extends Mixins(BaseMixin) {
 
     createThumbnailUrl(thumbnail: FileStateFileThumbnail) {
         let relative_url = ''
-        if (this.item.filename.lastIndexOf('/') !== -1) {
-            relative_url = this.item.filename.substring(0, this.item.filename.lastIndexOf('/') + 1)
+        if (this.displayFilename.lastIndexOf('/') !== -1) {
+            relative_url = this.displayFilename.substring(0, this.displayFilename.lastIndexOf('/') + 1)
         }
 
+        const timestamp = this.file?.modified?.getTime?.() ?? this.item.metadata.modified
+
         return `${this.apiUrl}/server/files/gcodes/${escapePath(relative_url + thumbnail.relative_path)}?timestamp=${
-            this.item.metadata.modified
+            timestamp
         }`
     }
 

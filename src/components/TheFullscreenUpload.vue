@@ -9,7 +9,7 @@
 import { Mixins } from 'vue-property-decorator'
 import BaseMixin from '@/components/mixins/base'
 import Component from 'vue-class-component'
-import { validGcodeExtensions } from '@/store/variables'
+import { isGcodeFile } from '@/store/variables'
 import { mdiTrayArrowDown } from '@mdi/js'
 
 @Component
@@ -82,9 +82,7 @@ export default class TheFullscreenUpload extends Mixins(BaseMixin) {
             await this.$store.dispatch('files/uploadSetMaxNumber', files.length)
 
             for (const file of files) {
-                const extensionPos = file.name.lastIndexOf('.')
-                const extension = file.name.slice(extensionPos)
-                const isGcode = validGcodeExtensions.includes(extension)
+                const isGcode = isGcodeFile(file.name)
 
                 let path = ''
                 if (this.currentRoute === '/files' && isGcode) path = this.currentPathGcodes

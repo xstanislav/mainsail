@@ -50,12 +50,30 @@ export default class HistoryListPanelDetailsDialog extends Mixins(BaseMixin) {
     @VModel({ type: Boolean }) showDialog!: boolean
     @Prop({ type: Object, required: true }) readonly job!: ServerHistoryStateJob
 
+    get sourcePlate(): number | null {
+        const plate = this.job.metadata?.source_plate
+        return typeof plate === 'number' ? plate : null
+    }
+
+    get sourcePlateLabel(): string {
+        const name = this.job.metadata?.source_plate_name
+        const plate = this.sourcePlate
+        if (typeof name === 'string' && name) return `${name} (${this.$t('Files.Plate', { index: plate })})`
+
+        return this.$t('Files.Plate', { index: plate }).toString()
+    }
+
     get entries() {
         const entries: { name: string; value: string | null; exists: boolean }[] = [
             {
                 name: this.$t('History.Filename').toString(),
-                value: this.job.filename,
+                value: (this.job.metadata?.source_filename as string | undefined) ?? this.job.filename,
                 exists: true,
+            },
+            {
+                name: this.$t('Files.Plate').toString(),
+                value: this.sourcePlateLabel,
+                exists: this.sourcePlate !== null,
             },
             {
                 name: this.$t('History.Filesize').toString(),

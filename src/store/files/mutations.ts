@@ -3,7 +3,7 @@ import { getDefaultState } from './index'
 import { findDirectory } from '@/plugins/helpers'
 import { MutationTree } from 'vuex'
 import { FileState, FileStateFile } from '@/store/files/types'
-import { allowedMetadata } from '@/store/variables'
+import { allowedMetadata, isGcodeFile } from '@/store/variables'
 
 export const mutations: MutationTree<FileState> = {
     reset(state) {
@@ -89,8 +89,7 @@ export const mutations: MutationTree<FileState> = {
                 parent[indexFile].metadataRequested = false
                 parent[indexFile].metadataPulled = false
 
-                const extension = filename.substring(filename.lastIndexOf('.') + 1)
-                if (payload.item.root === 'gcodes' && extension === 'gcode') {
+                if (payload.item.root === 'gcodes' && isGcodeFile(filename)) {
                     Vue.$socket.emit(
                         'server.files.metadata',
                         { filename: payload.item.path },
@@ -155,8 +154,13 @@ export const mutations: MutationTree<FileState> = {
         if (indexFile !== undefined && indexFile > -1 && path && path[indexFile]) {
             if ('metadataPulled' in path[indexFile] && path[indexFile].metadataPulled) {
                 path[indexFile].metadataPulled = false
+                path[indexFile].metadataRequested = false
 
                 if ('thumbnails' in path[indexFile]) delete path[indexFile].thumbnails
+                if ('plates' in path[indexFile]) delete path[indexFile].plates
+                if ('plate_count' in path[indexFile]) delete path[indexFile].plate_count
+                if ('is_3mf' in path[indexFile]) delete path[indexFile].is_3mf
+                if ('sliced' in path[indexFile]) delete path[indexFile].sliced
             }
 
             path[indexFile].modified = new Date(payload.item.modified * 1000)
