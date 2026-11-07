@@ -282,6 +282,15 @@
         "SuccessfullyMoved": "{filename} movido con éxito.",
         "SuccessfullyRenamed": "{filename} renombrado con éxito.",
         "SuccessfullyUploaded": "{filename} subido con éxito!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "La temperatura actual de la cama caliente es relativamente alta. La boquilla puede estar obstruida al imprimir este filamento en un recinto cerrado. Por favor, abra la puerta frontal y/o retire el cristal superior.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Cuando active el modo vaso en espiral, las máquinas con estructura I3 no generarán videos timelapse.",
+            "not_generate_timelapse_10014002": "La impresora actual no admite timelapse en Modo Tradicional al imprimir Por Objeto.",
+            "not_support_traditional_timelapse": "Activar la fotografía timelapse tradicional puede causar imperfecciones en la superficie. Se recomienda cambiar al modo suave.",
+            "smooth_timelapse_without_prime_tower": "El modo suave para timelapse está activado, pero la torre de purga está desactivada, lo que puede causar defectos de impresión. Habilite la torre de purga, vuelva a laminar e imprima de nuevo.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "La dureza de la boquilla requerida por el filamento es más alta que la dureza de la boquilla por defecto de la impresora. Por favor, reemplace la boquilla endurecida o el filamento, de otra forma, la boquilla se atascará o se dañará."
+        },
         "Total": "Total",
         "UploadNewGcode": "Cargar nuevo G-Code",
         "Used": "Usado",

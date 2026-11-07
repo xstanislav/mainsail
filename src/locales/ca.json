@@ -1,3 +1,14 @@
 {
+    "Files": {
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "La temperatura actual del llit és relativament alta. El broquet es pot obstruir en imprimir aquest filament en un recinte tancat. Obriu la porta principal i/o traieu el vidre superior.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Quan s'habilita el mode Gerro Espiral, les màquines amb estructura I3 no generaran vídeos timelapse.",
+            "not_generate_timelapse_10014002": "La impressora actual no admet el timelapse en mode tradicional quan s'imprimeix per objecte.",
+            "not_support_traditional_timelapse": "Habilitar la fotografia tradicional timelapse pot causar imperfeccions a la superfície. Es recomana canviar al mode suau.",
+            "smooth_timelapse_without_prime_tower": "El mode suau per al timelapse està activat, però la torre de purga està desactivada, cosa que pot causar defectes d'impressió. Activeu la torre de purga, torneu a tallar i imprimiu de nou.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "La duresa del broquet que requereix el filament és superior a la duresa del broquet predeterminat de la impressora. Substituïu per un broquet endurit o el filament, en cas contrari, el broquet es desgastarà o es farà malbé."
+        }
+    },
     "title": "Catalan"
 }

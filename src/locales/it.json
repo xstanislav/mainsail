@@ -282,6 +282,15 @@
         "SuccessfullyMoved": "{filename} spostato con successo.",
         "SuccessfullyRenamed": "{filename} rinominato con successo.",
         "SuccessfullyUploaded": "Caricamento di {filename} riuscito!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "L'attuale temperatura del piano riscaldato è relativamente alta. Se si stampa questo filamento in uno spazio chiuso, l'ugello potrebbe ostruirsi. Si prega di aprire lo sportello anteriore e/o rimuovere il vetro superiore.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Quando si abilita la modalità vaso a spirale, le macchine con struttura I3 non genereranno video timelapse.",
+            "not_generate_timelapse_10014002": "La stampante corrente non supporta il timelapse in modalità tradizionale quando si stampa per oggetto.",
+            "not_support_traditional_timelapse": "L'attivazione della fotografia timelapse tradizionale può causare imperfezioni sulla superficie. Si consiglia di passare alla modalità fluida.",
+            "smooth_timelapse_without_prime_tower": "La modalità fluida per il timelapse è abilitata, ma la torre di spurgo è disattivata, il che potrebbe causare difetti di stampa. Abilitare la torre di spurgo, rieseguire lo slicing e stampare di nuovo.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "La resistenza dell'ugello richiesta dal filamento è superiore a quella dell'ugello predefinito della stampante. Si prega di sostituire l'ugello o il filamento, altrimenti l'ugello potrebbe logorarsi e danneggiarsi."
+        },
         "Total": "Totale",
         "UploadNewGcode": "Carica nuovo G-Code",
         "Used": "Utilizzato",

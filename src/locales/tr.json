@@ -289,6 +289,15 @@
         "SuccessfullyMoved": "{filename} başarıyla taşındı.",
         "SuccessfullyRenamed": "{filename} başarıyla yeniden adlandırıldı.",
         "SuccessfullyUploaded": "{filename} yükleme başarılı!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "Mevcut sıcak yatak sıcaklığı oldukça yüksek. Bu filamenti kapalı bir muhafaza içinde bastırırken nozzle tıkanabilir. Lütfen ön kapağı açın ve/veya üst camı çıkarın.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Spiral vazo modu etkinleştirildiğinde, I3 yapısına sahip makineler zaman atlamalı videolar oluşturmayacaktır.",
+            "not_generate_timelapse_10014002": "Geçerli yazıcı, Nesneye Göre yazdırırken Geleneksel Modda hızlandırılmış geçişi desteklememektedir.",
+            "not_support_traditional_timelapse": "Geleneksel timelapse etkinleştirilmesi yüzey kusurlarına neden olabilir. Yumuşak moda geçilmesi önerilir.",
+            "smooth_timelapse_without_prime_tower": "Hızlandırılmış çekim için yumuşak mod etkindir ancak ana kule kapalı olduğundan yazdırma kusurlarına neden olabilir. Lütfen prime tower'ı etkinleştirin, yeniden dilimleyin ve yeniden yazdırın.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "Filamentin gerektirdiği nozul sertliği, yazıcının varsayılan nozul sertliğinden daha yüksektir. Lütfen sertleşmiş nozulu veya filamenti değiştirin, aksi takdirde nozul aşınır veya hasar görür."
+        },
         "Total": "Toplam",
         "UploadNewGcode": "Yeni G-Kod yükle",
         "Used": "Kullanılmış",

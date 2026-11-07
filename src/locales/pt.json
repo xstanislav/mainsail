@@ -283,6 +283,15 @@
         "SuccessfullyMoved": "Movido com sucesso {filename}.",
         "SuccessfullyRenamed": "Renomeado com sucesso {filename}.",
         "SuccessfullyUploaded": "Sucesso no uploado do {filename}!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "A temperatura atual da mesa aquecida está relativamente alta. O bico pode entupir ao imprimir este filamento em um ambiente fechado. Por favor, abra a porta frontal e/ou remova o vidro superior.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Quando o modo vaso espiral está ativado, máquinas com estrutura I3 não irão gerar vídeos timelapse.",
+            "not_generate_timelapse_10014002": "A impressora atual não suporta timelapse no Modo Tradicional ao imprimir Por Objeto.",
+            "not_support_traditional_timelapse": "A habilitação da fotografia tradicional em timelapse pode causar imperfeições na superfície. É recomendado mudar para o modo suave.",
+            "smooth_timelapse_without_prime_tower": "O modo suave para timelapse está ativado, mas a torre de purga está desativada, o que pode causar defeitos na impressão. Ative a torre de purga, refatie e imprima de novo.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "A dureza do bico necessária para o filamento é maior do que a dureza padrão do bico da impressora. Por favor substitua o bico endurecido ou o filamento, caso contrário o bico será desgastado ou danificado."
+        },
         "Total": "Total",
         "UploadNewGcode": "Upload novo G-Code",
         "Used": "Usado",

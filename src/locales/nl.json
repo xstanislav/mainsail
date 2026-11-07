@@ -266,6 +266,15 @@
         "SuccessfullyMoved": "{filename} succesvol verplaatsd.",
         "SuccessfullyRenamed": "{filename} succesvol hernoemd.",
         "SuccessfullyUploaded": "Upload van {filename} succesvol!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "De huidige warmtebedtemperatuur is relatief hoog. Het mondstuk kan verstopt raken bij het printen van dit filament in een gesloten omgeving. Open de voordeur en/of verwijder het bovenste glas.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Wanneer de spiraalvaasmodus is ingeschakeld, genereren machines met een I3-structuur geen timelapse-video's.",
+            "not_generate_timelapse_10014002": "De huidige printer ondersteunt geen timelapse in de traditionele modus bij het printen per object.",
+            "not_support_traditional_timelapse": "Het inschakelen van traditionele timelapse-fotografie kan oneffenheden in het oppervlak veroorzaken. Het wordt aanbevolen om over te schakelen naar de vloeiende modus.",
+            "smooth_timelapse_without_prime_tower": "De vloeiende modus voor timelapse is ingeschakeld, maar de prime toren staat uit, wat printfouten kan veroorzaken. Schakel de prime toren in, slice opnieuw en print nogmaals.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "De door het filament vereiste hardheid van het mondstuk is hoger dan de standaard hardheid van het mondstuk van de printer. Vervang het geharde mondstuk of het filament, anders raakt het mondstuk versleten of beschadigd."
+        },
         "Total": "Totaal",
         "UploadNewGcode": "Upload nieuwe G-Code",
         "Used": "Gebruikt",

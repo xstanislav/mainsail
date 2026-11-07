@@ -289,6 +289,15 @@
         "SuccessfullyMoved": "已成功移動 {filename}。",
         "SuccessfullyRenamed": "已成功重新命名 {filename}。",
         "SuccessfullyUploaded": "{filename} 上傳成功！",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "目前熱床溫度比較高。在封閉的列印裝置中列印該線材時，噴嘴可能會堵塞。請打開前門和/或拆下上部玻璃。",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "啟用螺旋花瓶模式時，I3 結構的列印裝置不會產生縮時攝影影片。",
+            "not_generate_timelapse_10014002": "目前的列印裝置在使用逐件列印時不支援傳統模式的縮時攝影。",
+            "not_support_traditional_timelapse": "使用傳統模式的縮時攝影可能會導致表面缺陷。建議改為平滑模式。",
+            "smooth_timelapse_without_prime_tower": "縮時攝影的平滑模式已啟用，但換料塔已關閉，這可能會導致列印缺陷。請啟用換料塔、重新切片並再次列印。",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "線材所要求的噴嘴硬度高於列印裝置預設的噴嘴硬度。請更換硬化噴嘴或線材，否則噴嘴可能被磨損或損壞。"
+        },
         "Total": "總計",
         "UploadNewGcode": "上傳新 G-Code",
         "Used": "已使用",

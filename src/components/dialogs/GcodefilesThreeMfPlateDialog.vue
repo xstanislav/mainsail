@@ -67,13 +67,27 @@
                                     {{ $t('Files.NotPrintable') }}
                                 </v-chip>
                                 <v-alert
-                                    v-for="warning in plate.warnings ?? []"
-                                    :key="warning"
+                                    v-for="(warning, index) in plate.warnings ?? []"
+                                    :key="`${warning.code || warning.message}-${index}`"
                                     dense
                                     text
                                     type="warning"
-                                    class="mt-2 mb-0">
-                                    {{ warning }}
+                                    class="mt-2 mb-0 three-mf-plate__warning"
+                                    @click.stop="toggleWarning(plate, index)">
+                                    <div class="d-flex align-start">
+                                        <div
+                                            class="flex-grow-1 text-caption"
+                                            :class="{
+                                                'three-mf-plate__warning-text--collapsed': !isWarningExpanded(plate, index),
+                                            }">
+                                            {{ warningText(warning) }}
+                                        </div>
+                                        <v-btn icon x-small class="ml-1 flex-shrink-0" @click.stop="toggleWarning(plate, index)">
+                                            <v-icon small>
+                                                {{ isWarningExpanded(plate, index) ? mdiChevronUp : mdiChevronDown }}
+                                            </v-icon>
+                                        </v-btn>
+                                    </div>
                                 </v-alert>
                             </v-card-text>
                         </v-card>
@@ -102,15 +116,22 @@ import { Component, Mixins, Prop, VModel, Watch } from 'vue-property-decorator'
 import BaseMixin from '@/components/mixins/base'
 import GcodefilesMixin from '@/components/mixins/gcodefiles'
 import Panel from '@/components/ui/Panel.vue'
-import { FileStateFileThumbnail, FileStateGcodefile, FileStateThreeMfPlate } from '@/store/files/types'
+import {
+    FileStateFileThumbnail,
+    FileStateGcodefile,
+    FileStateThreeMfPlate,
+    FileStateThreeMfWarning,
+} from '@/store/files/types'
 import { escapePath, filamentWeightFormat, formatPrintTime } from '@/plugins/helpers'
-import { mdiCloseThick, mdiPalette } from '@mdi/js'
+import { mdiChevronDown, mdiChevronUp, mdiCloseThick, mdiPalette } from '@mdi/js'
 
 @Component({
     components: { Panel },
 })
 export default class GcodefilesThreeMfPlateDialog extends Mixins(BaseMixin, GcodefilesMixin) {
     mdiCloseThick = mdiCloseThick
+    mdiChevronDown = mdiChevronDown
+    mdiChevronUp = mdiChevronUp
     mdiPalette = mdiPalette
 
     @VModel({ type: Boolean }) showDialog!: boolean
@@ -118,6 +139,7 @@ export default class GcodefilesThreeMfPlateDialog extends Mixins(BaseMixin, Gcod
     @Prop({ type: String, default: 'print' }) readonly mode!: 'print' | 'queue' | 'view'
 
     selectedIndex: number | null = null
+    expandedWarnings: Record<string, boolean> = {}
 
     get metadataLoaded() {
         return this.item.metadataPulled === true
@@ -190,6 +212,36 @@ export default class GcodefilesThreeMfPlateDialog extends Mixins(BaseMixin, Gcod
         return filamentWeightFormat(weight)
     }
 
+    // IDs and texts mirror OrcaSlicer's Plater::get_slice_warning_string()
+    // and localization/i18n/<lang>/OrcaSlicer_<lang>.po.
+    warningText(warning: FileStateThreeMfWarning): string {
+        if (warning.code) {
+            const codeKey = `Files.ThreeMfWarnings.${warning.message}_${warning.code}`
+            if (this.$te(codeKey)) return this.$t(codeKey).toString()
+        }
+
+        const key = `Files.ThreeMfWarnings.${warning.message}`
+        if (this.$te(key)) return this.$t(key).toString()
+
+        const text = warning.message.replace(/_/g, ' ').trim()
+
+        return text.charAt(0).toUpperCase() + text.slice(1)
+    }
+
+    warningKey(plate: FileStateThreeMfPlate, index: number): string {
+        return `${plate.index}:${index}`
+    }
+
+    isWarningExpanded(plate: FileStateThreeMfPlate, index: number): boolean {
+        return this.expandedWarnings[this.warningKey(plate, index)] === true
+    }
+
+    toggleWarning(plate: FileStateThreeMfPlate, index: number) {
+        const key = this.warningKey(plate, index)
+
+        this.$set(this.expandedWarnings, key, !this.isWarningExpanded(plate, index))
+    }
+
     confirm() {
         if (this.selectedPlate === null) return
 
@@ -213,6 +265,7 @@ export default class GcodefilesThreeMfPlateDialog extends Mixins(BaseMixin, Gcod
     onShowDialogChanged(newVal: boolean) {
         if (!newVal) return
 
+        this.expandedWarnings = {}
         this.selectedIndex = this.plates.find((plate) => plate.printable !== false)?.index ?? null
 
         if (this.item.metadataPulled || this.item.metadataRequested) return
@@ -244,6 +297,17 @@ export default class GcodefilesThreeMfPlateDialog extends Mixins(BaseMixin, Gcod
 
 .three-mf-plate__image {
     background-color: rgba(255, 255, 255, 0.04);
+}
+
+.three-mf-plate__warning {
+    cursor: pointer;
+}
+
+.three-mf-plate__warning-text--collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .three-mf-plate__color {

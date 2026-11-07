@@ -289,6 +289,15 @@
         "SuccessfullyMoved": "成功移动{filename}。",
         "SuccessfullyRenamed": "成功修改名称{filename}。",
         "SuccessfullyUploaded": "成功上传{filename}！",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "当前热床温度相对较高。在封闭环境中打印此耗材丝可能会导致喷嘴堵塞。请打开前门和/或取下上部玻璃。",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "当启用旋转花瓶模式时，I3结构的机器将不会生成延时摄影。",
+            "not_generate_timelapse_10014002": "当前打印机在逐件打印时不支持传统模式延时摄影。",
+            "not_support_traditional_timelapse": "启用传统的延时摄影可能会导致表面瑕疵。建议更改为平滑模式。",
+            "smooth_timelapse_without_prime_tower": "延时摄影的平滑模式已启用，但擦拭塔已关闭，这可能会导致打印缺陷。请启用擦拭塔，重新切片后再打印。",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "该耗材丝所要求的喷嘴硬度高于打印机默认的喷嘴硬度。请更换为硬化喷嘴或更换耗材丝，否则喷嘴可能会磨损或损坏。"
+        },
         "Total": "合计",
         "UploadNewGcode": "上传新的G-Code",
         "Used": "已使用",

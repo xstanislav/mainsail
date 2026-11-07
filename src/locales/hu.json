@@ -289,6 +289,15 @@
         "SuccessfullyMoved": "Sikeresen áthelyezve: {filename}.",
         "SuccessfullyRenamed": "Sikeresen átnevezve: {filename}.",
         "SuccessfullyUploaded": "Sikeres feltöltés: {filename}!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "A jelenlegi asztalhőmérséklet viszonylag magas. Zárt térben történő nyomtatásnál ez a filament fúvókaeltömődést okozhat. Nyisd ki az elülső ajtót és/vagy vedd le a felső üveglapot.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Ha a spirál (váza) mód be van kapcsolva, az I3 felépítésű gépek nem készítenek Timelapse-videót.",
+            "not_generate_timelapse_10014002": "A jelenlegi nyomtató tárgyankénti nyomtatásnál nem támogatja a hagyományos Timelapse módot.",
+            "not_support_traditional_timelapse": "A hagyományos Timelapse bekapcsolása felületi hibákat okozhat. Javasoljuk, hogy válts sima módra.",
+            "smooth_timelapse_without_prime_tower": "A sima Timelapse mód be van kapcsolva, a törlőtorony azonban nincs, ami nyomtatási hibákat okozhat. Kapcsold be a törlőtornyot, szeletelj újra, majd nyomtass ismét.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "Ez a filament nagyobb keménységű fúvókát igényel. Kérlek, cseréld ki a fúvókát vagy válassz másik filamentet, különben előfordulhat, hogy a fúvóka idő előtt elhasználódik vagy megsérül."
+        },
         "Total": "Összesen",
         "UploadNewGcode": "Új Gcode feltöltése",
         "Used": "Felhasznált",

@@ -241,6 +241,15 @@
         "SuccessfullyMoved": "{filename} har flyttats.",
         "SuccessfullyRenamed": "{filename} har bytt namn.",
         "SuccessfullyUploaded": "Uppladdningen av {filename} lyckades!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "Byggplattans temperatur är relativt hög. Nozzeln kan sättas igen när det här filamentet skrivs ut i en sluten miljö. Öppna framluckan och/eller ta bort det övre glaset.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "När spiralvasläget är aktiverat genererar maskiner med I3-struktur inga timelapse-videor.",
+            "not_generate_timelapse_10014002": "Den aktuella skrivaren stöder inte timelapse i traditionellt läge vid utskrift objekt för objekt.",
+            "not_support_traditional_timelapse": "Aktivering av traditionell timelapse fotografering kan orsaka ojämnheter i ytan. Det rekommenderas att ändra till jämnt läge.",
+            "smooth_timelapse_without_prime_tower": "Jämnt läge för timelapse är aktiverat, men prime tornet är avstängt, vilket kan orsaka utskriftsdefekter. Aktivera prime tornet, bered om och skriv ut igen.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "Nozzelns hårdhet som filamentet kräver är högre än skrivarens standard för nozzeln. Byt ut den härdade nozzeln eller filamentet, annars kommer nozzeln att slitas ner eller skadas."
+        },
         "Total": "Sammanlagt",
         "UploadNewGcode": "Ladda upp ny G-Code",
         "Used": "Använt",

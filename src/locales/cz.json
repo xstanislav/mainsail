@@ -284,6 +284,15 @@
         "SuccessfullyMoved": "Úspěšně přesunut soubor {filename}.",
         "SuccessfullyRenamed": "Úspěšně přejmenován soubor {filename}.",
         "SuccessfullyUploaded": "Nahrávání souboru {filename} úspěšné!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "Aktuální teplota vyhřívané podložky je poměrně vysoká. Při tisku tohoto filamentu v uzavřeném boxu může dojít k ucpání trysky. Otevřete přední dvířka a/nebo sejměte horní sklo.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Při zapnutém režimu spirálové vázy nebudou stroje s konstrukcí I3 vytvářet časosběr.",
+            "not_generate_timelapse_10014002": "Aktuální tiskárna nepodporuje časosběr v tradičním režimu při tisku „Podle objektu“.",
+            "not_support_traditional_timelapse": "Povolení tradičního časosběru může způsobit nedokonalosti povrchu. Doporučujeme přepnout do režimu hladkého tisku.",
+            "smooth_timelapse_without_prime_tower": "Pro časosběr je povolen plynulý režim, ale čistící věž je vypnutá, což může způsobit vady tisku. Povolte prosím čistící věž, znovu proveďte slicování a spusťte tisk znovu.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "Tvrdost trysky požadovaná filamentem je vyšší než výchozí tvrdost trysky tiskárny. Vyměňte prosím za tvrzenou trysku nebo změňte filament, jinak dojde k opotřebení nebo poškození trysky."
+        },
         "Total": "Celkem",
         "UploadNewGcode": "Nahrát nový G-Code",
         "Used": "Použito",

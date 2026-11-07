@@ -289,6 +289,15 @@
         "SuccessfullyMoved": "{filename} erfolgreich verschoben.",
         "SuccessfullyRenamed": "{filename} erfolgreich umbenannt.",
         "SuccessfullyUploaded": "Hochladen von {filename} erfolgreich!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "Die aktuelle Temperatur des Druckbetts ist relativ hoch. Die Düse kann verstopft sein, wenn dieses Filament in einem geschlossenen Gehäuse gedruckt wird. Bitte öffnen Sie die Vordertür und/oder entfernen Sie das obere Glas.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Wenn der Spiral-Vase-Modus aktiviert ist, werden bei Maschinen mit I3-Struktur keine Zeitraffervideos erstellt.",
+            "not_generate_timelapse_10014002": "Der aktuelle Drucker unterstützt im traditionellen Modus keinen Zeitraffer beim Drucken nach Objekt.",
+            "not_support_traditional_timelapse": "Die Aktivierung der traditionellen Zeitrafferfotografie kann zu Oberflächenfehlern führen. Es wird empfohlen, in den Smooth-Modus zu wechseln.",
+            "smooth_timelapse_without_prime_tower": "Der Smooth-Modus für Zeitraffer ist aktiviert, aber der Prime-Turm ist deaktiviert, was zu Druckfehlern führen kann. Bitte aktivieren Sie den Prime-Turm, slice das Modell neu und drucken Sie erneut.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "Die für das Filament erforderliche Düsenhärte ist höher als die Standard-Düsenhärte des Druckers. Bitte wechseln Sie zu einer gehärteten Düse oder ändern Sie das Filament, da sich sonst die Düse abgenutzt oder beschädigt wird."
+        },
         "Total": "Gesamt",
         "UploadNewGcode": "G-Code hochladen",
         "Used": "Belegt",

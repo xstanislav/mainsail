@@ -224,6 +224,15 @@
         "SuccessfullyMoved": "{filename}が移動されました。",
         "SuccessfullyRenamed": "{filename}の名前が変更されました。",
         "SuccessfullyUploaded": "{filename}がアップロードされました!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "現在のヒートベッド温度が比較的高いです。密閉エンクロージャーでこのフィラメントを印刷するとノズルが詰まる可能性があります。フロントドアを開けるか上部ガラスを外してください。",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "スパイラルモードを有効にすると、I3構造のマシンではタイムラプスビデオが生成されません。",
+            "not_generate_timelapse_10014002": "現在のプリンターはオブジェクト別印刷時のトラディショナルモードでのタイムラプスをサポートしていません。",
+            "not_support_traditional_timelapse": "従来のタイムラプス撮影を有効にすると表面の不完全さが生じる可能性があります。スムーズモードに変更することをお勧めします。",
+            "smooth_timelapse_without_prime_tower": "タイムラプスのスムーズモードが有効ですが、プライムタワーがオフです。印刷不良が発生する可能性があります。プライムタワーを有効にして再スライスし、再印刷してください。",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "フィラメントが必要とするノズル硬度が、プリンターのデフォルトのノズル硬度より高くなっています。硬化ノズルかフィラメントに交換してください。交換しないと、ノズルが摩耗または損傷します。"
+        },
         "Total": "総計",
         "UploadNewGcode": "新しいGコードファイルをアップロード",
         "Used": "使用済み",

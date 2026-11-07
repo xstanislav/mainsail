@@ -252,6 +252,15 @@
         "SuccessfullyMoved": "Déplacement réussi de {filename}.",
         "SuccessfullyRenamed": "{filename} renommé avec succès.",
         "SuccessfullyUploaded": "Chargement de {filename} réussi!",
+        "ThreeMfWarnings": {
+            "bed_temperature_too_high_than_filament": "La température actuelle du plateau est relativement élevée. La buse peut se boucher lors de l’impression de ce filament dans une enceinte fermée. Veuillez ouvrir la porte avant et/ou retirer la vitre supérieure.",
+            "not_generate_timelapse": "Timelapse cannot be generated for the current print settings.",
+            "not_generate_timelapse_10014001": "Lorsque vous activez le mode vase spirale, les machines avec une structure I3 ne généreront pas de vidéos timelapse.",
+            "not_generate_timelapse_10014002": "L'imprimante actuelle ne prend pas en charge le timelapse en mode traditionnel lors de l'impression par objet.",
+            "not_support_traditional_timelapse": "L’activation de la photographie timelapse traditionnelle peut provoquer des imperfections de surface. Il est recommandé de passer en mode fluide.",
+            "smooth_timelapse_without_prime_tower": "Le mode lisse pour le timelapse est activé, mais la tour d'amorçage est désactivée, ce qui peut causer des défauts d'impression. Veuillez activer la tour d'amorçage, retrancher et imprimer à nouveau.",
+            "the_actual_nozzle_hrc_smaller_than_the_required_nozzle_hrc": "La dureté de la buse requise par le filament est supérieure à la dureté par défaut de la buse de l'imprimante. Veuillez remplacer la buse ou le filament, sinon la buse s'usera ou s'endommagera."
+        },
         "Total": "Total",
         "UploadNewGcode": "Charger un nouveau G-Code",
         "Used": "Utilisé",

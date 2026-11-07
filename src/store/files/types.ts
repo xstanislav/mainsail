@@ -13,6 +13,12 @@ export interface FileState {
     }
 }
 
+export interface FileStateThreeMfWarning {
+    message: string
+    level?: number | null
+    code?: string | null
+}
+
 export interface FileStateThreeMfPlate {
     index: number
     name: string
@@ -33,7 +39,7 @@ export interface FileStateThreeMfPlate {
     bed_type?: string | null
     locked?: boolean
     printable?: boolean
-    warnings?: string[]
+    warnings?: FileStateThreeMfWarning[]
     thumbnails?: FileStateFileThumbnail[]
 }
 
