@@ -74,15 +74,23 @@
                                     type="warning"
                                     class="mt-2 mb-0 three-mf-plate__warning"
                                     @click.stop="toggleWarning(plate, index)">
-                                    <div class="d-flex align-start">
+                                    <div class="d-flex align-center">
                                         <div
-                                            class="flex-grow-1 text-caption"
+                                            class="flex-grow-1 text-caption three-mf-plate__warning-text"
                                             :class="{
-                                                'three-mf-plate__warning-text--collapsed': !isWarningExpanded(plate, index),
-                                            }">
+                                                'three-mf-plate__warning-text--collapsed': !isWarningExpanded(
+                                                    plate,
+                                                    index
+                                                ),
+                                            }"
+                                            :title="warningText(warning)">
                                             {{ warningText(warning) }}
                                         </div>
-                                        <v-btn icon x-small class="ml-1 flex-shrink-0" @click.stop="toggleWarning(plate, index)">
+                                        <v-btn
+                                            icon
+                                            x-small
+                                            class="ml-1 flex-shrink-0"
+                                            @click.stop="toggleWarning(plate, index)">
                                             <v-icon small>
                                                 {{ isWarningExpanded(plate, index) ? mdiChevronUp : mdiChevronDown }}
                                             </v-icon>
@@ -301,13 +309,25 @@ export default class GcodefilesThreeMfPlateDialog extends Mixins(BaseMixin, Gcod
 
 .three-mf-plate__warning {
     cursor: pointer;
+    overflow: hidden;
+}
+
+.three-mf-plate__warning ::v-deep .v-alert__content {
+    min-width: 0;
+}
+
+.three-mf-plate__warning .d-flex {
+    min-width: 0;
+}
+
+.three-mf-plate__warning-text {
+    min-width: 0;
 }
 
 .three-mf-plate__warning-text--collapsed {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .three-mf-plate__color {

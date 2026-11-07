@@ -13,11 +13,20 @@
         <td class="px-0 text-center" style="width: 32px">
             <gcodefiles-thumbnail :item="item" />
         </td>
-        <td class=" ">
-            {{ item.filename }}
-            <v-chip v-if="multiPlate && plateCount > 1" x-small class="ml-2">
-                {{ $t('Files.PlateCount', { count: plateCount }) }}
-            </v-chip>
+        <td>
+            <div class="d-flex align-center file-list__name-cell">
+                <span class="text-truncate flex-grow-1" :title="item.filename">{{ item.filename }}</span>
+                <v-tooltip v-if="multiPlate && plateCount > 1" top>
+                    <template #activator="{ on, attrs }">
+                        <v-chip x-small class="ml-2 flex-shrink-0" v-bind="attrs" v-on="on">
+                            <v-icon small left>{{ mdiViewGrid }}</v-icon>
+                            {{ plateCount }}
+                        </v-chip>
+                    </template>
+                    <div>{{ $t('Files.PlateCount', { count: plateCount }) }}</div>
+                    <div v-if="plateNames" class="text-caption mt-1">{{ plateNames }}</div>
+                </v-tooltip>
+            </div>
         </td>
         <td class="text-right text-no-wrap">
             <v-tooltip v-if="item.last_status" top>
@@ -155,6 +164,7 @@ import {
     mdiPlaylistPlus,
     mdiRenameBox,
     mdiVideo3d,
+    mdiViewGrid,
 } from '@mdi/js'
 import ControlMixin from '@/components/mixins/control'
 import { convertPrintStatusIcon, convertPrintStatusIconColor, escapePath } from '@/plugins/helpers'
@@ -193,6 +203,7 @@ export default class GcodefilesPanelTableRowFile extends Mixins(BaseMixin, Contr
     mdiPlaylistPlus = mdiPlaylistPlus
     mdiRenameBox = mdiRenameBox
     mdiVideo3d = mdiVideo3d
+    mdiViewGrid = mdiViewGrid
 
     showContextMenu = false
     showContextMenuX = 0
@@ -221,6 +232,13 @@ export default class GcodefilesPanelTableRowFile extends Mixins(BaseMixin, Contr
 
     get plateCount() {
         return this.item.plate_count ?? this.item.plates?.length ?? 0
+    }
+
+    get plateNames(): string {
+        return (this.item.plates ?? [])
+            .map((plate) => plate.name)
+            .filter((name) => !!name)
+            .join(', ')
     }
 
     get printFile(): FileStateGcodefile {
@@ -421,6 +439,14 @@ export default class GcodefilesPanelTableRowFile extends Mixins(BaseMixin, Contr
 </script>
 
 <style scoped>
+.file-list__name-cell {
+    min-width: 0;
+}
+
+.file-list__name-cell > .text-truncate {
+    min-width: 0;
+}
+
 .file-list__count_printed {
     position: relative;
     top: 1px;
